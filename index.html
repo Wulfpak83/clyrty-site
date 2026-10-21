@@ -3,22 +3,609 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CLYRTY: clear your camera roll</title>
-<meta name="description" content="CLYRTY helps you clear your iPhone camera roll one clear decision at a time. Everything stays on your iPhone.">
-<link rel="stylesheet" href="site.css">
+<title>Clyrty - Swipe your camera roll clean</title>
+<meta name="description" content="Clyrty is the iPhone photo cleaner that works in piles. Swipe, queue, confirm. Nothing is deleted until you approve Apple's prompt. On-device, no account, no ads, no tracking.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800;900&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141414; --bg:#FBF7EF; --stone:#F2ECE0; --tint:#FFF0C2; --muted:#57534C;
+  --blue:#3D6BFF; --blue-soft:#DCE4FF; --green:#2BC46E; --green-deep:#0F7A3D; --green-soft:#D3F4E1;
+  --red:#FF4B4B; --red-soft:#FFE1DE; --violet:#7B5CFF; --violet-soft:#E8E1FF;
+  --yellow:#FFC83D; --pink:#FF72A8; --teal:#1FC2A5; --orange:#FF8A2B;
+  --pop:4px 5px 0 var(--ink); --pop-sm:2px 3px 0 var(--ink); --pop-lg:7px 9px 0 var(--ink);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --gutter:16px;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.disp{font-family:'Outfit',system-ui,sans-serif;font-weight:900;letter-spacing:-.035em;line-height:1.02}
+a{color:inherit}
+.wrap{width:min(1200px,100% - 2*var(--gutter));margin-inline:auto}
+.hl{display:inline-block;background:var(--hlc,var(--yellow));border:3px solid var(--ink);box-shadow:var(--pop);border-radius:14px;padding:0 .22em .06em;transform:rotate(-1.8deg);margin-top:.08em}
+.btn{display:inline-flex;align-items:center;gap:10px;font:900 18px 'Outfit',sans-serif;background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--pop);border-radius:18px;padding:14px 24px;text-decoration:none;cursor:pointer;transition:transform .18s var(--spring),box-shadow .18s}
+.btn:hover{transform:translate(-2px,-3px) rotate(-1deg);box-shadow:7px 9px 0 var(--ink)}
+.btn:active{transform:translate(3px,4px);box-shadow:1px 1px 0 var(--ink)}
+.btn.white{background:#fff}
+.kicker{display:inline-block;font:800 14px 'Outfit',sans-serif;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:99px;padding:5px 14px;margin-bottom:18px}
+
+/* nav */
+nav{position:sticky;top:10px;z-index:50;margin:10px auto 0;width:min(1200px,100% - 2*var(--gutter))}
+.nav-in{display:flex;align-items:center;justify-content:space-between;background:#fff;border:3px solid var(--ink);box-shadow:var(--pop-sm);border-radius:20px;padding:8px 10px 8px 16px}
+.logo{display:flex;align-items:center;gap:10px;font:900 26px 'Outfit';letter-spacing:-.04em;text-decoration:none}
+.logo i{width:34px;height:34px;background:var(--yellow);border:3px solid var(--ink);border-radius:11px;box-shadow:var(--pop-sm);display:grid;place-items:center;transform:rotate(-6deg)}
+.logo i svg{width:18px;height:18px}
+.nav-links{display:none;gap:26px;font:800 16px 'Outfit'}
+.nav-links a{text-decoration:none}.nav-links a:hover{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:5px}
+.nav .btn{padding:8px 16px;font-size:15px;border-radius:14px;box-shadow:var(--pop-sm)}
+@media(min-width:820px){.nav-links{display:flex}}
+
+/* hero */
+.hero{position:relative;padding:44px 0 70px}
+.hero-grid{display:grid;gap:40px;align-items:center}
+@media(min-width:960px){.hero-grid{grid-template-columns:1.1fr .9fr;gap:20px}}
+h1{font-size:clamp(46px,9.4vw,104px)}
+.hero p.lead{font-size:clamp(18px,2.2vw,22px);max-width:34em;margin:22px 0 28px;color:var(--muted);font-weight:700}
+.cta-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:12px;background:var(--ink);color:#fff;border-radius:16px;padding:9px 20px 9px 16px;text-decoration:none;border:3px solid var(--ink);box-shadow:4px 5px 0 var(--pink);transition:transform .18s var(--spring)}
+.badge:hover{transform:translate(-2px,-3px) rotate(1deg)}
+.badge svg{width:30px;height:30px;fill:#fff}
+.badge small{display:block;font:700 11px 'Nunito';opacity:.85;line-height:1.1}
+.badge b{display:block;font:800 21px 'Outfit';line-height:1.05}
+.soon{font:800 14px 'Nunito';color:var(--muted);margin-top:14px}
+.trust{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:2.5px solid var(--ink);border-radius:99px;padding:5px 14px 5px 8px;font:800 14px 'Outfit';box-shadow:var(--pop-sm)}
+.pill s{width:20px;height:20px;border-radius:50%;background:var(--c,var(--green));border:2px solid var(--ink);display:grid;place-items:center;text-decoration:none}
+.pill s svg{width:11px;height:11px}
+
+/* phone */
+.stage{position:relative;display:grid;place-items:center;min-height:640px}
+.blob{position:absolute;border:3px solid var(--ink);animation:spin 18s linear infinite}
+.blob.b1{width:150px;height:150px;border-radius:50%;background:var(--pink);left:2%;top:6%;animation:floaty 6s ease-in-out infinite}
+.blob.b2{width:110px;height:110px;background:var(--teal);right:4%;bottom:12%;border-radius:28px;animation:floaty 7s ease-in-out -2s infinite}
+.blob.b3{width:90px;height:90px;background:var(--blue);right:8%;top:2%;border-radius:50% 50% 0 0;animation:floaty 5s ease-in-out -1s infinite}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-22px) rotate(10deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.phone{position:relative;width:300px;height:610px;background:var(--bg);border:11px solid var(--ink);border-radius:50px;box-shadow:var(--pop-lg);overflow:hidden;transform:rotate(2.5deg);z-index:2}
+.phone .island{position:absolute;top:10px;left:50%;width:92px;height:26px;background:var(--ink);border-radius:20px;transform:translateX(-50%);z-index:5}
+.ph-head{padding:50px 18px 0;display:flex;justify-content:space-between;align-items:end}
+.ph-head h3{font-size:28px}.ph-head h3 span{background:var(--yellow);border:2.5px solid var(--ink);border-radius:9px;padding:0 7px 2px;box-shadow:var(--pop-sm);display:inline-block;transform:rotate(-2deg)}
+.ph-pill{font:800 12px 'Outfit';background:var(--yellow);border:2px solid var(--ink);border-radius:99px;padding:2px 10px;box-shadow:var(--pop-sm)}
+.deck{position:relative;height:340px;margin:20px 18px 0}
+.card{position:absolute;inset:0;border:3px solid var(--ink);border-radius:22px;box-shadow:var(--pop);overflow:hidden;background:var(--cbg);touch-action:none;cursor:grab;will-change:transform;transition:transform .5s var(--spring)}
+.card.drag{transition:none;cursor:grabbing}
+.card .sh{position:absolute;background:var(--sc);border:3px solid var(--ink)}
+.card .sh.circle{border-radius:50%}.card .sh.arch{border-radius:999px 999px 0 0}.card .sh.rect{border-radius:10px}
+.card .meta{position:absolute;left:12px;bottom:12px;background:#fff;border:2.5px solid var(--ink);border-radius:99px;font:800 12px 'Outfit';padding:2px 11px;box-shadow:var(--pop-sm)}
+.stamp{position:absolute;top:18px;font:900 26px 'Outfit';border:4px solid var(--ink);border-radius:12px;padding:0 12px 2px;opacity:0;background:#fff;transition:opacity .15s}
+.stamp.keep{right:14px;color:var(--green-deep);background:var(--green-soft);transform:rotate(9deg)}
+.stamp.queue{left:14px;color:#C21F1F;background:var(--red-soft);transform:rotate(-9deg)}
+.ph-actions{display:flex;justify-content:center;gap:28px;margin-top:26px}
+.rb{width:62px;height:62px;border-radius:50%;border:3px solid var(--ink);box-shadow:var(--pop-sm);display:grid;place-items:center;cursor:pointer;transition:transform .15s var(--spring);background:var(--bgc)}
+.rb:hover{transform:scale(1.12) rotate(-6deg)}.rb:active{transform:scale(.92)}
+.rb svg{width:26px;height:26px}
+.ph-stats{display:flex;justify-content:center;gap:8px;margin-top:16px;font:800 12px 'Outfit'}
+.ph-stats span{border:2px solid var(--ink);border-radius:99px;padding:1px 10px;background:#fff}
+.ph-stats b{display:inline-block;min-width:1.2em;text-align:center}
+.float{position:absolute;z-index:4;background:#fff;border:3px solid var(--ink);border-radius:18px;box-shadow:var(--pop);padding:10px 16px;font:900 18px 'Outfit';line-height:1.1;animation:floaty2 5s ease-in-out infinite}
+.float small{display:block;font:800 12px 'Nunito';color:var(--muted)}
+.float.f1{left:-4%;top:26%;background:var(--green-soft);--r:-6deg}
+.float.f2{right:-2%;top:48%;background:var(--tint);--r:5deg;animation-delay:-2s}
+.float.f3{left:-3%;top:62%;background:var(--violet-soft);--r:4deg;animation-delay:-3.4s}
+@keyframes floaty2{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-14px) rotate(calc(var(--r) * -1))}}
+@media(max-width:520px){.float.f1{left:-2%;top:20%}.float.f2{right:-2%}.float.f3{display:none}.stage{min-height:700px}}
+
+/* marquee */
+.marq{background:var(--ink);color:#fff;border-block:3px solid var(--ink);overflow:hidden;transform:rotate(-1.2deg);margin:10px -20px 0;position:relative;z-index:3}
+.marq-t{display:flex;gap:0;width:max-content;animation:marq 28s linear infinite}
+.marq span{font:900 30px 'Outfit';padding:12px 26px;white-space:nowrap;letter-spacing:-.02em}
+.marq span:nth-child(4n+1){color:var(--yellow)}.marq span:nth-child(4n+2){color:var(--pink)}.marq span:nth-child(4n+3){color:var(--teal)}.marq span:nth-child(4n){color:#fff}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* sections */
+section{padding:96px 0}
+.sec-h{font-size:clamp(38px,6.4vw,74px);max-width:14em}
+.sec-p{max-width:36em;color:var(--muted);margin-top:16px;font-size:19px}
+.rev{opacity:0;transform:translateY(40px) scale(.97);transition:opacity .6s ease,transform .7s var(--spring);transition-delay:var(--d,0s)}
+.rev.in{opacity:1;transform:none}
+
+/* piles */
+.piles{display:grid;gap:30px;margin-top:48px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:760px){.piles{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:420px){.pile h3,.pile h3 b{font-size:22px}.pile p{font-size:13px}}
+.pile{position:relative;padding:8px 0 0;cursor:pointer}
+.pile .stack{position:relative;aspect-ratio:1/1.02;margin:0 14px 16px 0}
+.pile .layer{position:absolute;inset:0;border:3px solid var(--ink);border-radius:24px;transition:transform .4s var(--spring)}
+.pile .l3{background:var(--c3);transform:rotate(-5deg) translate(-6px,4px)}
+.pile .l2{background:var(--c2);transform:rotate(5deg) translate(8px,2px)}
+.pile .front{position:absolute;inset:0;border:3px solid var(--ink);border-radius:24px;box-shadow:var(--pop);overflow:hidden;background:var(--ink);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;transition:transform .4s var(--spring)}
+.pile:hover .l3{transform:rotate(-12deg) translate(-26px,8px)}
+.pile:hover .l2{transform:rotate(11deg) translate(26px,4px)}
+.pile:hover .front{transform:translateY(-8px) rotate(-1.5deg)}
+.pile .cell{position:relative;overflow:hidden;background:var(--cbg)}
+.pile .cell i{position:absolute;background:var(--sc)}
+.pile .tag{position:absolute;left:10px;top:10px;z-index:2;font:800 13px 'Outfit';background:var(--yellow);border:2.5px solid var(--ink);border-radius:99px;padding:1px 11px;box-shadow:var(--pop-sm)}
+.pile h3{font-size:30px;display:flex;justify-content:space-between;align-items:baseline}
+.pile h3 b{font:900 30px 'Outfit';color:var(--blue)}
+.pile p{color:var(--muted);font-size:15px;font-weight:700}
+.note{font:700 14px 'Nunito';color:var(--muted);margin-top:26px}
+
+/* smart finds */
+.finds{background:var(--stone);border-block:3px solid var(--ink)}
+.find-grid{display:grid;gap:26px;margin-top:48px}
+@media(min-width:900px){.find-grid{grid-template-columns:repeat(3,1fr)}}
+.fcard{background:#fff;border:3px solid var(--ink);border-radius:28px;box-shadow:var(--pop);padding:26px;display:flex;flex-direction:column;gap:18px;transition:transform .3s var(--spring)}
+.fcard:hover{transform:translateY(-8px) rotate(-.8deg)}
+.fcard h3{font-size:34px}.fcard p{color:var(--muted)}
+.demo{height:190px;border:3px solid var(--ink);border-radius:20px;position:relative;overflow:hidden;background:var(--bgd)}
+/* dup demo */
+.dup .tw{position:absolute;width:84px;height:104px;border:3px solid var(--ink);border-radius:14px;background:var(--yellow);top:42px;overflow:hidden}
+.dup .tw i{position:absolute;width:44px;height:44px;border-radius:50%;background:var(--pink);border:3px solid var(--ink);left:16px;top:18px}
+.dup .t1{left:calc(50% - 98px);animation:dupA 4.4s var(--spring) infinite}
+.dup .t2{left:calc(50% + 14px);animation:dupB 4.4s var(--spring) infinite}
+@keyframes dupA{0%,25%{transform:rotate(-4deg)}50%,80%{transform:translateX(56px) rotate(0)}100%{transform:rotate(-4deg)}}
+@keyframes dupB{0%,25%{transform:rotate(4deg);opacity:1}50%,80%{transform:translateX(-56px) rotate(0);opacity:0}100%{transform:rotate(4deg);opacity:1}}
+.dup .lbl{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font:900 14px 'Outfit';background:#fff;border:2.5px solid var(--ink);border-radius:99px;padding:1px 12px;white-space:nowrap}
+.dup .lbl::after{content:"2 near-identical shots";animation:lbl 4.4s steps(1) infinite}
+@keyframes lbl{0%,45%{content:"2 near-identical shots"}50%,85%{content:"keep the best one"}100%{content:"2 near-identical shots"}}
+/* blur demo */
+.blur .ph{position:absolute;inset:18px 30px 48px;border:3px solid var(--ink);border-radius:16px;background:var(--teal);overflow:hidden;animation:blurA 4s ease-in-out infinite}
+.blur .ph i{position:absolute;border:3px solid var(--ink)}
+.blur .ph i:nth-child(1){width:70px;height:70px;border-radius:50%;background:var(--yellow);left:24px;top:22px}
+.blur .ph i:nth-child(2){width:60px;height:90px;background:var(--pink);right:26px;bottom:-4px;border-radius:12px 12px 0 0}
+@keyframes blurA{0%,35%{filter:blur(9px)}55%,100%{filter:blur(0)}}
+.blur .lbl{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);font:900 14px 'Outfit';background:#fff;border:2.5px solid var(--ink);border-radius:99px;padding:1px 12px;white-space:nowrap}
+.blur .lbl::after{content:"blurry, flagged";animation:lbl2 4s steps(1) infinite}
+@keyframes lbl2{0%,50%{content:"blurry, flagged"}55%,100%{content:"sharp, kept"}}
+/* video demo */
+.vid .bars{position:absolute;inset:22px 22px 16px;display:flex;flex-direction:column;gap:12px;justify-content:center}
+.vid .bar{height:34px;border:3px solid var(--ink);border-radius:12px;background:#fff;position:relative;overflow:hidden}
+.vid .bar b{position:absolute;inset:0 auto 0 0;background:var(--c);width:var(--w);transform-origin:left;animation:grow 3.6s var(--spring) infinite;border-right:3px solid var(--ink)}
+.vid .bar span{position:absolute;right:10px;top:3px;font:900 14px 'Outfit'}
+.vid .bar:nth-child(2) b{animation-delay:.15s}.vid .bar:nth-child(3) b{animation-delay:.3s}
+@keyframes grow{0%{transform:scaleX(0)}30%,85%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+
+/* safe delete */
+.safe{background:var(--ink);color:#fff;position:relative;overflow:hidden}
+.safe .sec-p{color:#d8d2c4}
+.steps{display:grid;gap:22px;margin-top:52px;position:relative}
+@media(min-width:900px){.steps{grid-template-columns:repeat(4,1fr)}}
+.step{background:var(--bg);color:var(--ink);border:3px solid #fff;border-radius:26px;padding:22px;box-shadow:6px 7px 0 var(--sh);position:relative;transition:transform .3s var(--spring)}
+.step:hover{transform:translateY(-6px) rotate(1deg)}
+.step .n{width:46px;height:46px;border-radius:50%;background:var(--sh);border:3px solid var(--ink);display:grid;place-items:center;font:900 22px 'Outfit';margin-bottom:12px}
+.step h3{font-size:26px;margin-bottom:6px}.step p{font-size:15.5px;color:var(--muted)}
+.step .mini{height:84px;border:3px solid var(--ink);border-radius:14px;margin-top:14px;background:#fff;position:relative;overflow:hidden;display:grid;place-items:center}
+.alertmock{background:#fff;border:3px solid var(--ink);border-radius:16px;padding:8px 12px;text-align:center;font:800 12px 'Outfit';width:78%}
+.alertmock div{display:flex;gap:6px;margin-top:6px}
+.alertmock div span{flex:1;border:2px solid var(--ink);border-radius:8px;padding:1px 0}
+.alertmock div span:last-child{background:var(--red);color:#fff;animation:tap 3s ease-in-out infinite}
+@keyframes tap{0%,60%,100%{transform:scale(1)}70%{transform:scale(.88)}80%{transform:scale(1.08)}}
+.trashmock{font:900 15px 'Outfit';display:flex;align-items:center;gap:10px}
+.ring{width:46px;height:46px;border-radius:50%;border:4px solid var(--ink);background:conic-gradient(var(--teal) 0 var(--p,70%),#eee 0);animation:ring 5s linear infinite}
+@property --p{syntax:'<percentage>';inherits:false;initial-value:0%}
+@keyframes ring{from{--p:0%}to{--p:100%}}
+.qmock{display:flex;gap:6px}
+.qmock i{width:30px;height:42px;border:2.5px solid var(--ink);border-radius:8px;background:var(--c);animation:pop 2.4s var(--spring) infinite;animation-delay:var(--dl)}
+@keyframes pop{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px) rotate(-6deg)}}
+.safe .deco{position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:var(--violet);border:3px solid #fff;opacity:.9;animation:spin 30s linear infinite;border-style:dashed}
+
+/* privacy */
+.priv-grid{display:grid;gap:22px;margin-top:48px}
+@media(min-width:820px){.priv-grid{grid-template-columns:repeat(4,1fr)}}
+.stampbox{border:3px solid var(--ink);border-radius:26px;padding:26px 22px;box-shadow:var(--pop);background:var(--bgc);transition:transform .3s var(--spring)}
+.stampbox:nth-child(odd){transform:rotate(-1.5deg)}.stampbox:nth-child(even){transform:rotate(1.5deg)}
+.stampbox:hover{transform:rotate(0) translateY(-8px) scale(1.03)}
+.stampbox .x{width:60px;height:60px;border-radius:50%;background:#fff;border:3px solid var(--ink);display:grid;place-items:center;margin-bottom:16px;position:relative}
+.stampbox .x svg{width:30px;height:30px}
+.stampbox h3{font-size:34px}.stampbox p{font-size:15.5px;margin-top:6px}
+
+/* widget */
+.wid{background:var(--tint);border-block:3px solid var(--ink)}
+.wid-grid{display:grid;gap:50px;align-items:center}
+@media(min-width:960px){.wid-grid{grid-template-columns:1fr 1fr}}
+.wcard{background:#fff;border:3px solid var(--ink);border-radius:32px;box-shadow:var(--pop-lg);padding:24px;max-width:480px;transform:rotate(-2.5deg);transition:transform .4s var(--spring)}
+.wcard:hover{transform:rotate(0) scale(1.03)}
+.wtop{display:flex;gap:26px;align-items:flex-start}
+.flame{width:64px;height:64px;border-radius:20px;background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--pop-sm);display:grid;place-items:center;animation:wob 2.4s var(--spring) infinite}
+@keyframes wob{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(6deg) scale(1.1)}}
+.flame svg{width:30px;height:30px}
+.bignum{font:900 76px 'Outfit';line-height:.9;letter-spacing:-.05em}
+.wlbl{font:800 16px 'Outfit';color:var(--muted)}
+.wbottom{display:flex;gap:12px;margin-top:18px;align-items:center;flex-wrap:wrap}
+.wbtn{background:var(--blue);color:#fff;font:900 18px 'Outfit';border:3px solid var(--ink);box-shadow:var(--pop-sm);border-radius:14px;padding:6px 18px}
+.wchip{background:var(--stone);border:3px solid var(--ink);border-radius:14px;padding:6px 14px;font:800 14px 'Outfit'}
+.days{display:flex;gap:10px;margin-top:30px;flex-wrap:wrap}
+.day{width:50px;text-align:center;font:800 13px 'Outfit'}
+.day i{display:block;width:50px;height:50px;border-radius:16px;border:3px solid var(--ink);background:#fff;margin-bottom:6px;display:grid;place-items:center;transition:transform .5s var(--spring),background .3s;transition-delay:var(--dl)}
+.days.in .day i.on{background:var(--yellow);transform:translateY(-8px) rotate(-5deg);box-shadow:var(--pop-sm)}
+.day i svg{width:22px;height:22px;opacity:0;transition:opacity .3s;transition-delay:var(--dl)}
+.days.in .day i.on svg{opacity:1}
+.bullets{list-style:none;padding:0;margin-top:26px;display:grid;gap:12px}
+.bullets li{display:flex;gap:12px;align-items:flex-start;font-size:18px}
+.bullets li s{flex:none;width:26px;height:26px;border-radius:9px;background:var(--green);border:2.5px solid var(--ink);display:grid;place-items:center;margin-top:2px}
+.bullets li s svg{width:14px;height:14px}
+
+/* faq */
+.faq{background:var(--stone);border-block:3px solid var(--ink)}
+.faq-list{margin-top:44px;display:grid;gap:16px;max-width:860px}
+details{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:var(--pop-sm);transition:transform .25s var(--spring)}
+details[open]{box-shadow:var(--pop);transform:translateY(-3px) rotate(-.4deg)}
+summary{list-style:none;cursor:pointer;padding:18px 22px;font:900 21px 'Outfit';letter-spacing:-.02em;display:flex;justify-content:space-between;gap:14px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary i{flex:none;width:34px;height:34px;border-radius:50%;background:var(--yellow);border:3px solid var(--ink);display:grid;place-items:center;transition:transform .35s var(--spring)}
+summary i svg{width:14px;height:14px}
+details[open] summary i{transform:rotate(135deg);background:var(--pink)}
+details p{padding:0 22px 20px;color:var(--muted);font-size:17px}
+
+/* final */
+.final{text-align:center;position:relative;overflow:hidden}
+.final h2{font-size:clamp(46px,9vw,112px);max-width:11em;margin:0 auto}
+.final .cta-row{justify-content:center;margin-top:34px}
+.conf{position:absolute;border:3px solid var(--ink);animation:floaty 7s ease-in-out infinite}
+footer{background:var(--ink);color:#fff;padding:44px 0 56px}
+.foot{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+.foot .logo i{border-color:#fff}
+.foot nav,.foot .links{position:static;display:flex;gap:24px;font:800 16px 'Outfit';width:auto}
+.foot a{text-decoration:none}.foot a:hover{text-decoration:underline}
+.copy{width:100%;color:#a9a396;font:700 13px 'Nunito';margin-top:6px}
+
+html.shot .rev{transition:none!important}
+/* focus */
+a:focus-visible,summary:focus-visible,button:focus-visible,.card:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .rev{opacity:1;transform:none}
+  .marq-t{transform:none}
+  .blur .ph{filter:none}
+  .vid .bar b{transform:none}
+  .days .day i.on{background:var(--yellow)}.days .day i.on svg{opacity:1}
+  .ring{background:conic-gradient(var(--teal) 0 70%,#eee 0)}
+}
+</style>
 </head>
 <body>
-<main>
-<h1 class="brand">CLYRTY</h1>
-<p class="lead">Clear your camera roll, one clear decision at a time.</p>
-<ul>
-<li>Your library sorted into piles: months, On This Day, duplicates, blurry photos and large videos.</li>
-<li>Swipe to keep, hide, decide later or queue for removal, and undo any time.</li>
-<li>Nothing is deleted until you confirm Apple's Photos prompt, and Recently Deleted keeps items for up to 30 days.</li>
-<li>Everything stays on your iPhone. No account, no ads, no tracking.</li>
-</ul>
-<p>CLYRTY is coming to the App Store for iPhone.</p>
-<p class="links"><a href="privacy/">Privacy Policy</a> <span aria-hidden="true">|</span> <a href="terms/">Terms of Use</a> <span aria-hidden="true">|</span> <a href="support/">Support</a></p>
-</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" fill="none" stroke="#141414" stroke-width="4.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#141414"/></symbol>
+  </defs>
+</svg>
+
+<nav class="nav" aria-label="Main">
+  <div class="nav-in">
+    <a class="logo" href="#top"><i><svg><use href="#i-star"/></svg></i>Clyrty</a>
+    <div class="nav-links">
+      <a href="#piles">Piles</a><a href="#finds">Smart finds</a><a href="#safe">Safe delete</a><a href="#widget">Widget</a><a href="#faq">FAQ</a>
+    </div>
+    <a class="btn" href="#">Coming soon</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker rev">The swipe cleaner for iPhone</span>
+      <h1 class="rev" style="--d:.08s">Swipe your <span class="hl">camera roll</span> clean.</h1>
+      <p class="lead rev" style="--d:.16s">Clyrty hands you your photos one pile at a time. Keep the good ones, queue the rest, then confirm once. Nothing leaves your library until you say so.</p>
+      <div class="cta-row rev" style="--d:.24s">
+        <a class="badge" href="#" aria-label="App Store badge placeholder, coming soon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.700-2.900-1.900-3.500-1.900-1.500-.2-2.900.9-3.700.9-.8 0-1.900-.9-3.200-.8-1.600 0-3.100 1-4 2.400-1.700 3-.4 7.300 1.200 9.700.8 1.200 1.800 2.500 3 2.400 1.200 0 1.700-.8 3.100-.8 1.400 0 1.900.8 3.200.8 1.300 0 2.100-1.200 2.900-2.400.9-1.300 1.300-2.600 1.300-2.700 0 0-2.400-1-2.400-4zM14 5.400c.7-.8 1.100-1.900 1-3-1 0-2.100.7-2.800 1.500-.6.700-1.100 1.800-1 2.900 1.100.1 2.100-.6 2.800-1.400z"/></svg>
+          <span><small>Download on the</small><b>App Store</b></span>
+        </a>
+        <a class="btn white" href="#piles">See how it works</a>
+      </div>
+      <p class="soon rev" style="--d:.3s">Coming soon to the App Store.</p>
+      <div class="trust rev" style="--d:.34s">
+        <span class="pill"><s style="--c:var(--green)"><svg><use href="#i-check"/></svg></s>On-device</span>
+        <span class="pill"><s style="--c:var(--blue)"><svg><use href="#i-check"/></svg></s>No account</span>
+        <span class="pill"><s style="--c:var(--pink)"><svg><use href="#i-check"/></svg></s>No ads</span>
+        <span class="pill"><s style="--c:var(--yellow)"><svg><use href="#i-check"/></svg></s>No tracking</span>
+      </div>
+    </div>
+
+    <div class="stage" aria-label="Animated demo of swiping photos">
+      <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+      <div class="float f1">Keep <small id="fKeep">0 kept</small></div>
+      <div class="float f2">Queued <small id="fQueue">0 so far</small></div>
+      <div class="float f3">Example session <small id="fMb">0.0 MB queued</small></div>
+      <div class="phone">
+        <div class="island"></div>
+        <div class="ph-head"><h3>Your <span>piles.</span></h3><span class="ph-pill">Sample</span></div>
+        <div class="deck" id="deck"></div>
+        <div class="ph-actions">
+          <button class="rb" style="--bgc:var(--red)" id="bQ" aria-label="Queue this photo"><svg style="stroke:#fff"><use href="#i-x"/></svg></button>
+          <button class="rb" style="--bgc:var(--green)" id="bK" aria-label="Keep this photo"><svg><use href="#i-check"/></svg></button>
+        </div>
+        <div class="ph-stats"><span>Kept <b id="sK">0</b></span><span>Queued <b id="sQ">0</b></span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="marq" aria-hidden="true"><div class="marq-t" id="marq"></div></div>
+
+<section id="piles">
+  <div class="wrap">
+    <span class="kicker rev">Piles, not a giant grid</span>
+    <h2 class="sec-h rev">Ten thousand photos is a lot. One <span class="hl" style="--hlc:var(--pink)">pile</span> is not.</h2>
+    <p class="sec-p rev">Clyrty slices your library into small piles you can finish in a sitting: a month, your newest shots, what you took on this day in past years, and the clutter hunters below. Finish a pile, feel the win, pick the next one.</p>
+    <div class="piles" id="pileGrid"></div>
+    <p class="note rev">Pile names are real. Counts shown here are sample numbers for illustration.</p>
+  </div>
+</section>
+
+<section class="finds" id="finds">
+  <div class="wrap">
+    <span class="kicker rev">Smart finds</span>
+    <h2 class="sec-h rev">The clutter finds <span class="hl" style="--hlc:var(--teal)">itself.</span></h2>
+    <p class="sec-p rev">Three piles that do the spotting for you, so your thumbs only make the calls.</p>
+    <div class="find-grid">
+      <article class="fcard rev" style="--d:.05s">
+        <div class="demo dup" style="--bgd:var(--blue-soft)"><div class="tw t1"><i></i></div><div class="tw t2"><i></i></div><span class="lbl"></span></div>
+        <h3>Duplicates</h3><p>Near-identical shots land in the same group. Keep your favorite, queue the twin.</p>
+      </article>
+      <article class="fcard rev" style="--d:.15s">
+        <div class="demo blur" style="--bgd:var(--red-soft)"><div class="ph"><i></i><i></i></div><span class="lbl"></span></div>
+        <h3>Blurry</h3><p>Out-of-focus frames get their own pile, so the misses are easy to wave goodbye to.</p>
+      </article>
+      <article class="fcard rev" style="--d:.25s">
+        <div class="demo vid" style="--bgd:var(--green-soft)"><div class="bars">
+          <div class="bar"><b style="--c:var(--orange);--w:92%"></b><span>Largest</span></div>
+          <div class="bar"><b style="--c:var(--yellow);--w:68%"></b><span>Big</span></div>
+          <div class="bar"><b style="--c:var(--pink);--w:44%"></b><span>Chunky</span></div>
+        </div></div>
+        <h3>Large videos</h3><p>The biggest files sit at the top. Where most of your storage hides is where you start.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="safe" id="safe">
+  <div class="deco"></div>
+  <div class="wrap">
+    <span class="kicker rev" style="background:var(--yellow);color:var(--ink)">Safe delete</span>
+    <h2 class="sec-h rev">Swipe fast. <span class="hl" style="--hlc:var(--green);color:var(--ink)">Nothing</span> is gone until you say so.</h2>
+    <p class="sec-p rev">Queueing a photo only marks it. Deletion happens after you review the pile and approve Apple's own prompt. Deleted photos then wait in Recently Deleted for 30 days, so a change of heart is still fixable.</p>
+    <div class="steps">
+      <div class="step rev" style="--sh:var(--yellow);--d:.05s"><div class="n">1</div><h3>Swipe</h3><p>Keep or queue each photo. Both are one flick.</p>
+        <div class="mini"><div class="qmock"><i style="--c:var(--green);--dl:0s"></i><i style="--c:var(--red);--dl:.2s"></i><i style="--c:var(--green);--dl:.4s"></i><i style="--c:var(--red);--dl:.6s"></i></div></div></div>
+      <div class="step rev" style="--sh:var(--pink);--d:.15s"><div class="n">2</div><h3>Review</h3><p>See everything you queued in one place. Restore any photo you changed your mind about.</p>
+        <div class="mini"><div class="qmock"><i style="--c:var(--blue);--dl:0s"></i><i style="--c:var(--yellow);--dl:.15s"></i><i style="--c:var(--teal);--dl:.3s"></i><i style="--c:var(--pink);--dl:.45s"></i></div></div></div>
+      <div class="step rev" style="--sh:var(--teal);--d:.25s"><div class="n">3</div><h3>Confirm</h3><p>Apple shows its own delete prompt. You tap, and only then do photos go.</p>
+        <div class="mini"><div class="alertmock">Delete photos?<div><span>Cancel</span><span>Delete</span></div></div></div></div>
+      <div class="step rev" style="--sh:var(--orange);--d:.35s"><div class="n">4</div><h3>30-day safety net</h3><p>Items move to Recently Deleted and stay there for 30 days.</p>
+        <div class="mini"><div class="trashmock"><div class="ring"></div>30 days</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <span class="kicker rev">On-device privacy</span>
+    <h2 class="sec-h rev">Your photos stay <span class="hl" style="--hlc:var(--violet);color:#fff">yours.</span></h2>
+    <p class="sec-p rev">Clyrty works with your library right on your iPhone. There is nothing to sign up for and nothing watching you swipe.</p>
+    <div class="priv-grid">
+      <div class="stampbox rev" style="--bgc:var(--green-soft);--d:.05s"><div class="x"><svg><use href="#i-check"/></svg></div><h3>On-device</h3><p>Your photos are handled on your iPhone.</p></div>
+      <div class="stampbox rev" style="--bgc:var(--blue-soft);--d:.12s"><div class="x"><svg><use href="#i-x"/></svg></div><h3>No account</h3><p>Open the app and start. No email, no password.</p></div>
+      <div class="stampbox rev" style="--bgc:var(--red-soft);--d:.19s"><div class="x"><svg><use href="#i-x"/></svg></div><h3>No ads</h3><p>The screen is for your photos, not for someone else's pitch.</p></div>
+      <div class="stampbox rev" style="--bgc:var(--tint);--d:.26s"><div class="x"><svg><use href="#i-x"/></svg></div><h3>No tracking</h3><p>No analytics watching what you keep or queue.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="wid" id="widget">
+  <div class="wrap wid-grid">
+    <div>
+      <span class="kicker rev">Widget and streaks</span>
+      <h2 class="sec-h rev">A tiny nudge on <span class="hl" style="--hlc:var(--blue);color:#fff">your home screen.</span></h2>
+      <p class="sec-p rev">Keep a daily streak going and see how many photos are waiting for you today, without opening the app. One tap on the widget takes you straight to Review.</p>
+      <ul class="bullets">
+        <li class="rev"><s><svg><use href="#i-check"/></svg></s>Streak counts the days you clean up</li>
+        <li class="rev" style="--d:.08s"><s><svg><use href="#i-check"/></svg></s>Shows how many photos are left to review today</li>
+        <li class="rev" style="--d:.16s"><s><svg><use href="#i-check"/></svg></s>Small and medium sizes for your home screen</li>
+      </ul>
+    </div>
+    <div>
+      <div class="wcard rev" aria-label="Example widget">
+        <div class="wtop">
+          <div><div class="flame"><svg><use href="#i-star"/></svg></div></div>
+          <div><div class="bignum" id="wStreak">3</div><div class="wlbl">day streak</div></div>
+          <div style="margin-left:auto;text-align:right"><div class="bignum" style="color:var(--green-deep)" id="wToday">12</div><div class="wlbl">to review today</div></div>
+        </div>
+        <div class="wbottom"><span class="wbtn">Review &rsaquo;</span><span class="wchip">Example widget</span></div>
+      </div>
+      <div class="days rev" id="days" style="--d:.1s">
+        <div class="day"><i class="on" style="--dl:.1s"><svg><use href="#i-check"/></svg></i>Mon</div>
+        <div class="day"><i class="on" style="--dl:.25s"><svg><use href="#i-check"/></svg></i>Tue</div>
+        <div class="day"><i class="on" style="--dl:.4s"><svg><use href="#i-check"/></svg></i>Wed</div>
+        <div class="day"><i></i>Thu</div><div class="day"><i></i>Fri</div><div class="day"><i></i>Sat</div><div class="day"><i></i>Sun</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <span class="kicker rev">FAQ</span>
+    <h2 class="sec-h rev">Good questions, <span class="hl" style="--hlc:var(--pink)">quick answers.</span></h2>
+    <div class="faq-list">
+      <details class="rev"><summary>Will Clyrty delete my photos without asking?<i><svg><use href="#i-plus"/></svg></i></summary><p>No. Swiping only queues a photo. Photos are removed only after you review the queue and approve Apple's delete prompt.</p></details>
+      <details class="rev"><summary>Can I get a photo back?<i><svg><use href="#i-plus"/></svg></i></summary><p>Before you confirm, restore anything from the queue. After you confirm, items go to Recently Deleted in Photos, where they stay for 30 days.</p></details>
+      <details class="rev"><summary>Do I need an account?<i><svg><use href="#i-plus"/></svg></i></summary><p>No. Clyrty has no sign-up, no ads and no tracking, and it works on your iPhone.</p></details>
+      <details class="rev"><summary>What do I get for free?<i><svg><use href="#i-plus"/></svg></i></summary><p>15 removals a day, free. Keeping, hiding, undo and restore stay free, and every pile and tool is open to everyone. Unlimited plans are available inside the app.</p></details>
+      <details class="rev"><summary>Is it on the App Store yet?<i><svg><use href="#i-plus"/></svg></i></summary><p>Not yet. It is coming soon to the App Store.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="conf" style="width:90px;height:90px;border-radius:50%;background:var(--yellow);left:6%;top:18%"></div>
+  <div class="conf" style="width:70px;height:70px;border-radius:20px;background:var(--pink);right:8%;top:12%;animation-delay:-2s"></div>
+  <div class="conf" style="width:60px;height:60px;border-radius:50% 50% 0 0;background:var(--teal);left:12%;bottom:12%;animation-delay:-4s"></div>
+  <div class="conf" style="width:80px;height:80px;border-radius:50%;background:var(--blue);right:10%;bottom:16%;animation-delay:-1s"></div>
+  <div class="wrap" style="position:relative">
+    <h2 class="rev">Ready for a <span class="hl" style="--hlc:var(--green)">lighter</span> camera roll?</h2>
+    <div class="cta-row rev" style="--d:.1s">
+      <a class="badge" href="#" aria-label="App Store badge placeholder, coming soon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.900-1.900-3.500-1.900-1.500-.2-2.900.9-3.700.9-.8 0-1.900-.9-3.200-.8-1.600 0-3.100 1-4 2.400-1.700 3-.4 7.300 1.200 9.700.8 1.200 1.800 2.500 3 2.400 1.200 0 1.700-.8 3.100-.8 1.400 0 1.900.8 3.200.8 1.300 0 2.100-1.200 2.900-2.400.9-1.300 1.300-2.600 1.300-2.700 0 0-2.400-1-2.400-4zM14 5.400c.7-.8 1.100-1.900 1-3-1 0-2.100.7-2.800 1.500-.6.700-1.100 1.800-1 2.900 1.100.1 2.100-.6 2.800-1.400z"/></svg>
+        <span><small>Download on the</small><b>App Store</b></span>
+      </a>
+    </div>
+    <p class="soon">Coming soon to the App Store.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <a class="logo" href="#top"><i><svg><use href="#i-star"/></svg></i>Clyrty</a>
+    <div class="links"><a href="privacy/">Privacy</a><a href="terms/">Terms</a><a href="support/">Support</a></div>
+    <p class="copy">Clyrty. Swipe your camera roll clean. Apple, iPhone and App Store are trademarks of Apple Inc.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function(s){return document.querySelector(s)};
+
+  /* art: bg, shape colors, layout variant */
+  var ART = [
+    ['#DCE4FF','#2BC46E','#FF72A8','a'],
+    ['#FFC83D','#3D6BFF','#FBF7EF','b'],
+    ['#D3F4E1','#FF8A2B','#7B5CFF','c'],
+    ['#FFE1DE','#1FC2A5','#FFC83D','a'],
+    ['#E8E1FF','#FF72A8','#2BC46E','b'],
+    ['#FFF0C2','#3D6BFF','#FF4B4B','c']
+  ];
+  var SIZES = [3.2,1.8,4.6,2.4,6.1,1.2,3.9,2.8];
+  function shapes(a,big){
+    var t=a[3];
+    var s = (t==='a') ? [['circle',54,54,52,10],['rect',46,70,48,50]] :
+            (t==='b') ? [['arch',60,64,38,22],['circle',34,34,16,16]] :
+                        [['rect',48,48,22,18],['circle',42,42,50,46]];
+    return s.map(function(x,i){
+      return '<div class="sh '+x[0]+'" style="--sc:'+a[i+1]+';width:'+x[1]+'%;'+(x[0]==='arch'?'height:'+(x[2]+10)+'%;':'height:'+x[2]+'%;')+'left:'+x[3]+'%;top:'+x[4]+'%;'+(i?'':'transform:rotate(-8deg);')+'"></div>';
+    }).join('');
+  }
+
+  /* hero deck */
+  var deck=$('#deck'), kept=0, queued=0, mb=0, n=0, locked=false, auto=null, pauseUntil=0;
+  var sK=$('#sK'), sQ=$('#sQ'), fKeep=$('#fKeep'), fQueue=$('#fQueue'), fMb=$('#fMb');
+  function mk(){
+    var a=ART[n%ART.length], size=SIZES[n%SIZES.length];
+    var c=document.createElement('div'); c.className='card'; c.tabIndex=-1;
+    c.style.setProperty('--cbg',a[0]); c.dataset.size=size;
+    c.innerHTML=shapes(a)+'<span class="meta">'+size.toFixed(1)+' MB</span><span class="stamp keep">KEEP</span><span class="stamp queue">QUEUE</span>';
+    n++; return c;
+  }
+  function layout(){
+    var cs=[].slice.call(deck.children).reverse(); // top first
+    cs.forEach(function(c,i){
+      if(c.classList.contains('drag')||c.dataset.gone) return;
+      c.style.zIndex=10-i;
+      c.style.transform='translateY('+(i*14)+'px) scale('+(1-i*.05)+') rotate('+(i===0?0:(i%2?-3:3))+'deg)';
+    });
+  }
+  function fill(){ while(deck.children.length<3){ deck.insertBefore(mk(),deck.firstChild); } layout(); }
+  function tick(v,el,fmt){ el.textContent=fmt(v); }
+  function counters(){
+    sK.textContent=kept; sQ.textContent=queued;
+    fKeep.textContent=kept+' kept'; fQueue.textContent=queued+' so far'; fMb.textContent=mb.toFixed(1)+' MB queued';
+  }
+  function commit(dir){
+    if(locked) return; var top=deck.lastElementChild; if(!top) return; locked=true;
+    top.classList.remove('drag'); top.dataset.gone=1;
+    top.querySelector('.stamp.'+(dir>0?'keep':'queue')).style.opacity=1;
+    top.style.transform='translate('+(dir*340)+'px,'+(-40)+'px) rotate('+(dir*24)+'deg)';
+    top.style.transition='transform .55s cubic-bezier(.5,0,.8,.4), opacity .4s .15s';
+    top.style.opacity=0;
+    if(dir>0) kept++; else { queued++; mb+=parseFloat(top.dataset.size); }
+    counters();
+    setTimeout(function(){ top.remove(); fill(); locked=false; },520);
+    layout();
+  }
+  fill(); counters();
+  var pat=[1,-1,1,1,-1,-1,1,-1];
+  var pi=0;
+  function step(){
+    if(document.hidden||Date.now()<pauseUntil) return;
+    var r=$('.stage').getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight) return;
+    commit(pat[pi++%pat.length]);
+  }
+  function pause(){ pauseUntil=Date.now()+4500; }
+  $('#bK').onclick=function(){pause();commit(1)}; $('#bQ').onclick=function(){pause();commit(-1)};
+  /* drag */
+  var sx=0, drag=null;
+  deck.addEventListener('pointerdown',function(e){
+    var top=deck.lastElementChild; if(locked||!top||!top.contains(e.target)) return;
+    drag=top; sx=e.clientX; top.classList.add('drag'); top.setPointerCapture(e.pointerId); pause();
+  });
+  deck.addEventListener('pointermove',function(e){
+    if(!drag) return; var dx=e.clientX-sx;
+    drag.style.transform='translate('+dx+'px,'+(-Math.abs(dx)*.12)+'px) rotate('+(dx*.08)+'deg)';
+    drag.querySelector('.stamp.keep').style.opacity=Math.max(0,Math.min(1,dx/70));
+    drag.querySelector('.stamp.queue').style.opacity=Math.max(0,Math.min(1,-dx/70));
+  });
+  function end(e){
+    if(!drag) return; var dx=e.clientX-sx, d=drag; drag=null; d.classList.remove('drag');
+    if(Math.abs(dx)>80){ commit(dx>0?1:-1); }
+    else { d.querySelectorAll('.stamp').forEach(function(s){s.style.opacity=0}); layout(); }
+  }
+  deck.addEventListener('pointerup',end); deck.addEventListener('pointercancel',end);
+  if(!reduce){ auto=setInterval(step,1500); } else { kept=4; queued=3; mb=8.9; counters(); }
+
+  /* marquee */
+  var names=['Months','Recents','On This Day','Duplicates','Blurry','Large videos','Screenshots','Keep','Queue','Confirm'];
+  var m=$('#marq'), html='';
+  for(var r=0;r<4;r++) names.forEach(function(x){ html+='<span>'+x+'</span>'; });
+  m.innerHTML=html;
+
+  /* pile cards */
+  var piles=[
+    ['October','Your month, start to finish',214,['#2BC46E','#FF72A8'],'Sample',0],
+    ['Recents','What you just shot',48,['#FFC83D','#3D6BFF'],'In review',1],
+    ['On This Day','Same date, past years',27,['#FF72A8','#1FC2A5'],'New',2],
+    ['Duplicates','Near-identical shots, grouped',86,['#7B5CFF','#FFC83D'],'Smart',3],
+    ['Blurry','Out-of-focus frames',39,['#FF8A2B','#2BC46E'],'Smart',4],
+    ['Large videos','Biggest files first',12,['#3D6BFF','#FF72A8'],'Smart',5]
+  ];
+  var pg=$('#pileGrid');
+  pg.innerHTML=piles.map(function(p,idx){
+    var cells='';
+    for(var k=0;k<4;k++){ var a=ART[(p[5]+k)%ART.length]; cells+='<div class="cell" style="--cbg:'+a[0]+'">'+
+      '<i style="--sc:'+a[1]+';width:'+(40+k*8)+'%;height:'+(40+k*8)+'%;left:'+(10+k*12)+'%;top:'+(14+((k*17)%30))+'%;border-radius:'+(k%2?'50%':'8px')+';border:2px solid #141414"></i>'+
+      '<i style="--sc:'+a[2]+';width:34%;height:34%;right:8%;bottom:10%;border-radius:'+(k%2?'8px':'50%')+';border:2px solid #141414"></i></div>'; }
+    return '<div class="pile rev" style="--d:'+(idx*.07)+'s"><div class="stack"><div class="layer l3" style="--c3:'+p[3][0]+'"></div><div class="layer l2" style="--c2:'+p[3][1]+'"></div><div class="front"><span class="tag">'+p[4]+'</span>'+cells+'</div></div>'+
+      '<h3>'+p[0]+'<b data-count="'+p[2]+'">0</b></h3><p>'+p[1]+'</p></div>';
+  }).join('');
+
+  /* count up + reveal */
+  function countUp(el){
+    var to=+el.dataset.count; if(reduce){el.textContent=to;return;}
+    var t0=performance.now(),d=1200;
+    (function f(t){ var p=Math.min(1,(t-t0)/d); p=1-Math.pow(1-p,3); el.textContent=Math.round(to*p); if(p<1) requestAnimationFrame(f); })(t0);
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); e.target.querySelectorAll('[data-count]').forEach(countUp); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.rev').forEach(function(el){ if(reduce){el.classList.add('in');el.querySelectorAll('[data-count]').forEach(countUp);} else io.observe(el); });
+
+  /* streak numbers */
+  var days=$('#days');
+  if(reduce){ days.classList.add('in'); }
+  else new MutationObserver(function(){ }).observe(days,{attributes:true});
+  document.querySelectorAll('.days').forEach(function(d){ var o=new MutationObserver(function(){}); });
+
+  if(location.hash==='#shot'){document.documentElement.classList.add('shot');document.querySelectorAll('.rev').forEach(function(el){el.classList.add('in');el.querySelectorAll('[data-count]').forEach(countUp);});}
+  /* hero entrance on load */
+  window.addEventListener('load',function(){ document.querySelectorAll('.hero .rev').forEach(function(el){ el.classList.add('in'); }); });
+})();
+</script>
 </body>
 </html>
